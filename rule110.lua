@@ -23,7 +23,7 @@ local gridsize = assert(tonumber(arg[2] or 1024))
 
 local App = class(ImGuiApp)
 
-App.name = 'Rule 110'
+App.title = 'Rule 110'
 
 local pingpong
 local updateShader
