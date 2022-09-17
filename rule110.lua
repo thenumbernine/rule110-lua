@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 local ffi = require 'ffi'
 local sdl = require 'ffi.sdl'
-local ig = require 'ffi.imgui'
+local ig = require 'imgui'
 local gl = require 'gl'
 local ImGuiApp = require 'imguiapp'	-- on windows, imguiapp needs to be before ig...
 local vec3ub = require 'vec-ffi.vec3ub'
@@ -19,9 +19,6 @@ local Image = require 'image'
 local clnumber = require 'cl.obj.number'
 local Mouse = require 'glapp.mouse'
 
--- there's a bug with using more than 1<<16, so the 'b' and 'a' channels have something wrong in their math
-local initValue = ffi.new('int[1]', bit.lshift(1,tonumber(arg[1]) or 17))
-local drawValue = ffi.new('int[1]', 25)
 local gridsize = assert(tonumber(arg[2] or 1024))
 
 local App = class(ImGuiApp)
@@ -153,6 +150,7 @@ local zoomFactor = .9
 local zoom = 1
 local viewPos = vec2(0,0)
 
+local value = ffi.new('int[1]', 0)
 function App:update()
 	local ar = self.width / self.height
 	
@@ -166,7 +164,6 @@ function App:update()
 			local x = math.floor(pos[1] + .5)
 			local y = math.floor(pos[2] + .5)
 			if x >= 0 and x < gridsize and y >= 0 and y < gridsize then
-				local value = ffi.new('int[1]', 0)
 				pingpong:draw{
 					callback = function()
 						gl.glReadPixels(x, gridsize-1, 1, 1, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, value)
@@ -253,9 +250,6 @@ function App:event(event, eventPtr)
 end
 
 function App:updateGUI()
-	ig.igInputInt('initial value', initValue)
-	ig.igInputInt('draw value', drawValue)
-	
 	if ig.igButton'Save' then
 		pingpong:prev():bind(0)	-- prev? shouldn't this be cur?
 		gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, bufferCPU)
