@@ -46,9 +46,10 @@ local function reset()
 		--bufferCPU[i] = math.random(0xffffffff)
 	end
 	bufferCPU[bit.rshift(gridsize,1) + gridsize * (gridsize-1)] = -1
-	pingpong:prev():bind(0)
-	gl.glTexSubImage2D(gl.GL_TEXTURE_2D, 0, 0, 0, gridsize, gridsize, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, bufferCPU)
-	pingpong:prev():unbind(0)
+	pingpong:prev()
+		:bind()
+		:subimage{data=bufferCPU}
+		:unbind()
 end
 
 function App:initGL()
@@ -174,9 +175,10 @@ function App:update()
 						end
 					end,
 				}
-				pingpong:prev():bind(0)
-				gl.glTexSubImage2D(gl.GL_TEXTURE_2D, 0, x, gridsize-1, 1, 1, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, value)
-				pingpong:prev():unbind(0)
+				pingpong:prev()
+					:bind()
+					:subimage{xoffset=x, yoffset=gridsize-1, width=1, height=1, data=value}
+					:unbind()
 			end
 		end
 		if mouse.rightDragging then
@@ -285,9 +287,10 @@ function App:updateGUI()
 				end
 			end
 		end
-		pingpong:prev():bind(0)
-		gl.glTexSubImage2D(gl.GL_TEXTURE_2D, 0, 0, 0, gridsize, gridsize, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, bufferCPU)
-		pingpong:prev():unbind(0)
+		pingpong:prev()
+			:bind()
+			:subimage{data=bufferCPU}
+			:unbind()
 	end
 
 	ig.igSameLine()
