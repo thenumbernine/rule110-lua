@@ -196,14 +196,6 @@ function App:update()
 		resetProjection = true,
 		shader = updateShader,
 		texs = {pingpong:prev()},
-		callback = function()
-			gl.glBegin(gl.GL_TRIANGLE_STRIP)
-			for _,v in ipairs{{0,0},{1,0},{0,1},{1,1}} do
-				gl.glTexCoord2d(v[1], v[2])
-				gl.glVertex2d(v[1], v[2])
-			end
-			gl.glEnd()
-		end,
 	}
 	pingpong:swap()
 
