@@ -229,11 +229,13 @@ function App:event(event, eventPtr)
 	local canHandleKeyboard = not ig.igGetIO()[0].WantCaptureKeyboard
 
 	if event.type == sdl.SDL_MOUSEBUTTONDOWN then
+		--[[
 		if event.button.button == sdl.SDL_BUTTON_WHEELUP then
 			zoom = zoom * zoomFactor
 		elseif event.button.button == sdl.SDL_BUTTON_WHEELDOWN then
 			zoom = zoom / zoomFactor
 		end
+		--]]
 	elseif event.type == sdl.SDL_KEYDOWN or event.type == sdl.SDL_KEYUP then
 		if event.key.keysym.sym == sdl.SDLK_LSHIFT then
 			leftShiftDown = event.type == sdl.SDL_KEYDOWN
