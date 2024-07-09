@@ -4,7 +4,6 @@ local asserteq = require 'ext.assert'.eq
 local sdl = require 'ffi.req' 'sdl'
 local ig = require 'imgui'
 local gl = require 'gl'
-local ImGuiApp = require 'imguiapp'	-- on windows, imguiapp needs to be before ig...
 local vec3ub = require 'vec-ffi.vec3ub'
 local vec2 = require 'vec.vec2'
 local GLProgram = require 'gl.program'
@@ -16,18 +15,16 @@ local template = require 'template'
 local Image = require 'image'
 -- isle of misfits:
 local clnumber = require 'cl.obj.number'
-local Mouse = require 'glapp.mouse'
 
 local gridsize = assert(tonumber(arg[2] or 1024))
 
-local App = ImGuiApp:subclass()
+local App = require 'imguiapp.withorbit'()
 
 App.title = 'Rule 110'
 
 local pingpong
 local updateShader
 local displayShader
-local mouse = Mouse()
 	
 local bufferCPU = ffi.new('int[?]', gridsize * gridsize)
 
@@ -53,6 +50,9 @@ end
 
 function App:initGL()
 	App.super.initGL(self)
+
+	self.view.ortho = true
+	self.view.orthoSize = 1
 
 	gl.glClearColor(.2, .2, .2, 0)
 
@@ -144,47 +144,29 @@ void main() {
 	glreport 'here'
 end
 
-local leftShiftDown
-local rightShiftDown 
-local zoomFactor = .9
-local zoom = 1
-local viewPos = vec2(0,0)
-
 local value = ffi.new('int[1]', 0)
 function App:update()
 	local ar = self.width / self.height
-	
+
 	local canHandleMouse = not ig.igGetIO()[0].WantCaptureMouse
-	if canHandleMouse then 
-		mouse:update()
-		if mouse.leftDown then
-			local pos = (vec2(mouse.pos:unpack()) - vec2(.5, .5)) * (2 / zoom)
+	if canHandleMouse then
+		if self.mouse.rightDown then
+			local pos = (vec2(self.mouse.pos:unpack()) - vec2(.5, .5)) * (2 * self.view.orthoSize)
 			pos[1] = pos[1] * ar
-			pos = ((pos + viewPos) * .5 + vec2(.5, .5)) * gridsize
+			pos = ((pos + vec2(self.view.pos:unpack())) * .5 + vec2(.5, .5)) * gridsize
 			local x = math.floor(pos[1] + .5)
 			local y = math.floor(pos[2] + .5)
 			if x >= 0 and x < gridsize and y >= 0 and y < gridsize then
 				pingpong:draw{
 					callback = function()
 						gl.glReadPixels(x, gridsize-1, 1, 1, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, value)
-						if value[0] == 0 then
-							value[0] = -1
-						else
-							value[0] = 0
-						end
+						value[0] = value[0] == 0 and -1 or 0
 					end,
 				}
 				pingpong:prev()
 					:bind()
 					:subimage{xoffset=x, yoffset=gridsize-1, width=1, height=1, data=value}
 					:unbind()
-			end
-		end
-		if mouse.rightDragging then
-			if leftShiftDown or rightShiftDown then
-				zoom = zoom * math.exp(10 * mouse.deltaPos.y)
-			else
-				viewPos = viewPos - vec2(mouse.deltaPos.x * ar, mouse.deltaPos.y) * (2 / zoom)
 			end
 		end
 	end
@@ -198,14 +180,7 @@ function App:update()
 	}
 	pingpong:swap()
 
-	gl.glMatrixMode(gl.GL_PROJECTION)
-	gl.glLoadIdentity()
-	gl.glOrtho(-ar, ar, -1, 1, -1, 1)
-
-	gl.glMatrixMode(gl.GL_MODELVIEW)
-	gl.glLoadIdentity()
-	gl.glScaled(zoom, zoom, 1)
-	gl.glTranslated(-viewPos[1], -viewPos[2], 0)
+	self.view:setup(ar)
 
 	gl.glClear(bit.bor(gl.GL_COLOR_BUFFER_BIT, gl.GL_DEPTH_BUFFER_BIT))
 	displayShader:use()
@@ -220,28 +195,6 @@ function App:update()
 	
 	GLProgram:useNone()
 	App.super.update(self)
-end
-
-function App:event(event, eventPtr)
-	App.super.event(self, event, eventPtr)
-	local canHandleMouse = not ig.igGetIO()[0].WantCaptureMouse
-	local canHandleKeyboard = not ig.igGetIO()[0].WantCaptureKeyboard
-
-	if event.type == sdl.SDL_MOUSEBUTTONDOWN then
-		--[[
-		if event.button.button == sdl.SDL_BUTTON_WHEELUP then
-			zoom = zoom * zoomFactor
-		elseif event.button.button == sdl.SDL_BUTTON_WHEELDOWN then
-			zoom = zoom / zoomFactor
-		end
-		--]]
-	elseif event.type == sdl.SDL_KEYDOWN or event.type == sdl.SDL_KEYUP then
-		if event.key.keysym.sym == sdl.SDLK_LSHIFT then
-			leftShiftDown = event.type == sdl.SDL_KEYDOWN
-		elseif event.key.keysym.sym == sdl.SDLK_RSHIFT then
-			rightShiftDown = event.type == sdl.SDL_KEYDOWN
-		end
-	end
 end
 
 function App:updateGUI()
