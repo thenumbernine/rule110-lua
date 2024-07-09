@@ -1,12 +1,11 @@
 #!/usr/bin/env luajit
 local ffi = require 'ffi'
+local asserteq = require 'ext.assert'.eq
 local sdl = require 'ffi.req' 'sdl'
 local ig = require 'imgui'
 local gl = require 'gl'
 local ImGuiApp = require 'imguiapp'	-- on windows, imguiapp needs to be before ig...
 local vec3ub = require 'vec-ffi.vec3ub'
-local class = require 'ext.class'
-local table = require 'ext.table'
 local vec2 = require 'vec.vec2'
 local GLProgram = require 'gl.program'
 local HSVTex = require 'gl.hsvtex'
@@ -21,7 +20,7 @@ local Mouse = require 'glapp.mouse'
 
 local gridsize = assert(tonumber(arg[2] or 1024))
 
-local App = class(ImGuiApp)
+local App = ImGuiApp:subclass()
 
 App.title = 'Rule 110'
 
@@ -251,9 +250,7 @@ function App:updateGUI()
 		gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, bufferCPU)
 		pingpong:prev():unbind(0)
 		Image(gridsize, gridsize, 3, 'unsigned char', function(x,y)
-			local value = bufferCPU[x + gridsize * y]
-			value = value % modulo
-			return colors[value+1]:unpack()
+			return colors[1 + tonumber(bufferCPU[x + gridsize * y]) % modulo]:unpack()
 		end):save'output.glsl.png'
 	end
 
@@ -261,9 +258,9 @@ function App:updateGUI()
 
 	if ig.igButton'Load' then
 		local image = Image'output.glsl.png'
-		assert(image.width == gridsize)
-		assert(image.height == gridsize)
-		assert(image.channels == 3)
+		asserteq(image.width, gridsize)
+		asserteq(image.height, gridsize)
+		asserteq(image.channels, 3)
 		for y=0,image.height-1 do
 			for x=0,image.width-1 do
 				local rgb = image.buffer + 4 * (x + image.width * y)
