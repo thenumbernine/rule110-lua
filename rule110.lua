@@ -4,6 +4,7 @@ local asserteq = require 'ext.assert'.eq
 local sdl = require 'ffi.req' 'sdl'
 local ig = require 'imgui'
 local gl = require 'gl'
+local bit = bit or bit32 or require 'bit'
 local vec3ub = require 'vec-ffi.vec3ub'
 local vec2d = require 'vec-ffi.vec2d'
 
@@ -97,9 +98,9 @@ function App:initGL()
 	self.vtxBuffer = GLArrayBuffer{data = vtxs}:unbind()
 
 	updateShader = GLProgram{
-		vertexCode =
-GLProgram.getVersionPragma()..'\n'
-..[[
+		version = 'latest',
+		header = 'precision highp float;',
+		vertexCode =[[
 uniform mat4 mvProjMat;
 in vec2 vtx;
 out vec2 tc;
@@ -108,9 +109,7 @@ void main() {
 	gl_Position = mvProjMat * vec4(vtx * 2. - 1., 0., 1.);
 }
 ]],
-		fragmentCode = template(
-GLProgram.getVersionPragma()..'\n'
-..[[
+		fragmentCode = template([[
 in vec2 tc;
 out vec4 fragColor;
 uniform sampler2D tex;
@@ -159,9 +158,9 @@ void main() {
 	}
 
 	displayShader = GLProgram{
-		vertexCode =
-GLProgram.getVersionPragma()..'\n'
-..[[
+		version = 'latest',
+		header = 'precision highp float;',
+		vertexCode = [[
 uniform mat4 mvProjMat;
 in vec2 vtx;
 out vec2 tc;
@@ -170,9 +169,7 @@ void main() {
 	gl_Position = mvProjMat * vec4(vtx * 2. - 1., 0., 1.);
 }
 ]],
-		fragmentCode =
-GLProgram.getVersionPragma()..'\n'
-..[[
+		fragmentCode = [[
 in vec2 tc;
 out vec4 fragColor;
 uniform sampler2D tex;
@@ -229,8 +226,8 @@ function App:update()
 	end
 
 	-- update
+	gl.glViewport(0, 0, gridsize, gridsize)
 	pingpong:draw{
-		viewport = {0, 0, gridsize, gridsize},
 		callback = function()
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 			self.updateSceneObj.texs[1] = pingpong:prev()
@@ -238,6 +235,7 @@ function App:update()
 			self.updateSceneObj:draw()
 		end,
 	}
+	gl.glViewport(0, 0, self.width, self.height)
 	pingpong:swap()
 
 	gl.glClear(gl.GL_COLOR_BUFFER_BIT)
