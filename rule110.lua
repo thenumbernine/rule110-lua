@@ -4,10 +4,11 @@ local asserteq = require 'ext.assert'.eq
 local sdl = require 'ffi.req' 'sdl'
 local ig = require 'imgui'
 local gl = require 'gl'
-local bit = bit or bit32 or require 'bit'
+local template = require 'template'
 local vec3ub = require 'vec-ffi.vec3ub'
 local vec2d = require 'vec-ffi.vec2d'
-
+local matrix_ffi = require 'matrix.ffi'
+local Image = require 'image'
 local glreport = require 'gl.report'
 local GLPingPong = require 'gl.pingpong'
 local GLTex2D = require 'gl.tex2d'
@@ -18,18 +19,13 @@ local GLProgram = require 'gl.program'
 local GLGeometry = require 'gl.geometry'
 local GLSceneObject = require 'gl.sceneobject'
 
-local template = require 'template'
-local Image = require 'image'
 -- isle of misfits:
 local clnumber = require 'cl.obj.number'
-
-local matrix_ffi = require 'matrix.ffi'
-matrix_ffi.real = 'float'
-require 'glapp.view'.useBuiltinMatrixMath = true
 
 local gridsize = assert(tonumber(arg[2] or 1024))
 
 local App = require 'imguiapp.withorbit'()
+App.viewUseBuiltinMatrixMath = true
 
 App.title = 'Rule 110'
 
@@ -66,7 +62,7 @@ function App:initGL()
 	self.view.orthoSize = 1
 	self.view.pos:set(0, 0, 1)
 
-	self.pingPongProjMat = matrix_ffi{4,4}:zeros():setOrtho(-1, 1, -1, 1, -1, 1)
+	self.pingPongProjMat = matrix_ffi({4,4}, 'float'):zeros():setOrtho(-1, 1, -1, 1, -1, 1)
 
 	gl.glClearColor(.2, .2, .2, 0)
 
