@@ -30,8 +30,6 @@ App.viewUseBuiltinMatrixMath = true
 App.title = 'Rule 110'
 
 local pingpong
-local updateShader
-local displayShader
 
 local bufferCPU = ffi.new('int[?]', gridsize * gridsize)
 
@@ -83,29 +81,33 @@ function App:initGL()
 	}
 	reset()
 
-	self.vtxBufferDim = 2
-	local vtxs = {
-		0, 0,
-		1, 0,
-		0, 1,
-		1, 1,
+	self.quadGeom = GLGeometry{
+		mode = gl.GL_TRIANGLE_STRIP,
+		vertexes = {
+			data = 	{
+				0, 0,
+				1, 0,
+				0, 1,
+				1, 1,
+			},
+			dim = 2,	
+		},
 	}
-	self.vtxBufferCount = #vtxs / self.vtxBufferDim
-	self.vtxBuffer = GLArrayBuffer{data = vtxs}:unbind()
 
-	updateShader = GLProgram{
-		version = 'latest',
-		header = 'precision highp float;',
-		vertexCode =[[
+	self.updateSceneObj = GLSceneObject{
+		program = {
+			version = 'latest',
+			header = 'precision highp float;',
+			vertexCode = [[
 uniform mat4 mvProjMat;
-in vec2 vtx;
+in vec2 vertex;
 out vec2 tc;
 void main() {
-	tc = vtx;
-	gl_Position = mvProjMat * vec4(vtx * 2. - 1., 0., 1.);
+	tc = vertex;
+	gl_Position = mvProjMat * vec4(vertex * 2. - 1., 0., 1.);
 }
 ]],
-		fragmentCode = template([[
+			fragmentCode = template([[
 in vec2 tc;
 out vec4 fragColor;
 uniform sampler2D tex;
@@ -129,43 +131,33 @@ void main() {
 		}
 	}
 }
-]],			{
-				clnumber = clnumber,
-				gridsize = gridsize,
-				du = 1 / gridsize,
-			}
-		),
-		uniforms = {
-			tex = 0,
+]],				{
+					clnumber = clnumber,
+					gridsize = gridsize,
+					du = 1 / gridsize,
+				}
+			),
+			uniforms = {
+				tex = 0,
+			},
 		},
-	}:useNone()
-
-	self.quadGeom = GLGeometry{
-		mode = gl.GL_TRIANGLE_STRIP,
-		count = self.vtxBufferCount,
-	}
-
-	self.updateSceneObj = GLSceneObject{
-		program = updateShader,
 		geometry = self.quadGeom,
-		attrs = {
-			vtx = self.vtxBuffer,
-		},
 	}
 
-	displayShader = GLProgram{
-		version = 'latest',
-		header = 'precision highp float;',
-		vertexCode = [[
+	self.drawSceneObj = GLSceneObject{
+		program = {
+			version = 'latest',
+			header = 'precision highp float;',
+			vertexCode = [[
 uniform mat4 mvProjMat;
-in vec2 vtx;
+in vec2 vertex;
 out vec2 tc;
 void main() {
-	tc = vtx;
-	gl_Position = mvProjMat * vec4(vtx * 2. - 1., 0., 1.);
+	tc = vertex;
+	gl_Position = mvProjMat * vec4(vertex * 2. - 1., 0., 1.);
 }
 ]],
-		fragmentCode = [[
+			fragmentCode = [[
 in vec2 tc;
 out vec4 fragColor;
 uniform sampler2D tex;
@@ -173,17 +165,11 @@ void main() {
 	fragColor = texture(tex, tc);
 }
 ]],
-		uniforms = {
-			tex = 0,
+			uniforms = {
+				tex = 0,
+			},
 		},
-	}:useNone()
-
-	self.drawSceneObj = GLSceneObject{
-		program = displayShader,
 		geometry = self.quadGeom,
-		attrs = {
-			vtx = self.vtxBuffer,
-		},
 	}
 
 	glreport 'here'
