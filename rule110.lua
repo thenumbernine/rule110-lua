@@ -1,7 +1,6 @@
 #!/usr/bin/env luajit
 local ffi = require 'ffi'
 local asserteq = require 'ext.assert'.eq
-local sdl = require 'ffi.req' 'sdl'
 local ig = require 'imgui'
 local gl = require 'gl'
 local template = require 'template'
