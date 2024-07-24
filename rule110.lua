@@ -91,7 +91,7 @@ function App:initGL()
 	self.updateSceneObj = GLSceneObject{
 		program = {
 			version = 'latest',
-			header = 'precision highp float;',
+			precision = 'best',
 			vertexCode = [[
 uniform mat4 mvProjMat;
 in vec2 vertex;
@@ -141,7 +141,7 @@ void main() {
 	self.drawSceneObj = GLSceneObject{
 		program = {
 			version = 'latest',
-			header = 'precision highp float;',
+			precision = 'best',
 			vertexCode = [[
 uniform mat4 mvProjMat;
 in vec2 vertex;
