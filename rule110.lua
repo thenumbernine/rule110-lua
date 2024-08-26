@@ -19,7 +19,6 @@ local clnumber = require 'cl.obj.number'
 local gridsize = assert(tonumber(arg[2] or 1024))
 
 local App = require 'imguiapp.withorbit'()
-App.viewUseBuiltinMatrixMath = true
 
 App.title = 'Rule 110'
 
