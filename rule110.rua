@@ -232,9 +232,9 @@ App.updateGUI = [:] do
 
 	if ig.igButton'Load' then
 		local image = Image'output.glsl.png'
-		asserteq(image.width, gridsize)
-		asserteq(image.height, gridsize)
-		asserteq(image.channels, 3)
+		assert.eq(image.width, gridsize)
+		assert.eq(image.height, gridsize)
+		assert.eq(image.channels, 3)
 		for y=0,image.height-1 do
 			for x=0,image.width-1 do
 				local rgb = image.buffer + ((x + image.width * y) << 2)

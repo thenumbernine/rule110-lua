@@ -1,6 +1,6 @@
 #!/usr/bin/env luajit
 local ffi = require 'ffi'
-local asserteq = require 'ext.assert'.eq
+local assert = require 'ext.assert'
 local ig = require 'imgui'
 local gl = require 'gl'
 local template = require 'template'
@@ -236,9 +236,9 @@ function App:updateGUI()
 
 	if ig.igButton'Load' then
 		local image = Image'output.glsl.png'
-		asserteq(image.width, gridsize)
-		asserteq(image.height, gridsize)
-		asserteq(image.channels, 3)
+		assert.eq(image.width, gridsize)
+		assert.eq(image.height, gridsize)
+		assert.eq(image.channels, 3)
 		for y=0,image.height-1 do
 			for x=0,image.width-1 do
 				local rgb = image.buffer + bit.lshift(x + image.width * y, 2)
