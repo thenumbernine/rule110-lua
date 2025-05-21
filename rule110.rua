@@ -10,9 +10,7 @@ local glreport = require 'gl.report'
 local GLPingPong = require 'gl.pingpong'
 local GLGeometry = require 'gl.geometry'
 local GLSceneObject = require 'gl.sceneobject'
-
--- isle of misfits:
-local clnumber = require 'cl.obj.number'
+local glnumber = require 'gl.number'
 
 local gridsize = assert(tonumber(arg[2] or 1024))
 
@@ -103,8 +101,8 @@ in vec2 tc;
 out vec4 fragColor;
 uniform sampler2D tex;
 
-const float gridsize = <?=clnumber(gridsize)?>;
-const float du = <?=clnumber(du)?>;
+const float gridsize = <?=glnumber(gridsize)?>;
+const float du = <?=glnumber(du)?>;
 
 void main() {
 	if (floor(tc.y * gridsize) < gridsize - 1.) {
@@ -123,7 +121,7 @@ void main() {
 	}
 }
 ]],				{
-					clnumber = clnumber,
+					glnumber = glnumber,
 					gridsize = gridsize,
 					du = 1 / gridsize,
 				}
