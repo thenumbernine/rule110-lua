@@ -29,7 +29,7 @@ local colors = {
 	vec3ub(255,0,0),
 }
 
-local reset = [] do
+local reset = || do
 	ffi.fill(bufferCPU, ffi.sizeof'int' * gridsize * gridsize)
 	for i=0,gridsize*gridsize-1 do
 		--bufferCPU[i] = math.random(0,1) * -1
@@ -42,7 +42,7 @@ local reset = [] do
 		:unbind()
 end
 
-App.initGL = [:] do
+App.initGL = |:| do
 	App.super.initGL(self)
 
 	self.view.ortho = true
@@ -165,10 +165,10 @@ void main() {
 end
 
 -- hmm wish there was an easier way to do this
-local vec3d_to_vec2d = [v] vec2d(v.x, v.y)
+local vec3d_to_vec2d = |v| vec2d(v.x, v.y)
 
 local value = ffi.new('int[1]', 0)
-App.update = [:] do
+App.update = |:| do
 	local ar = self.width / self.height
 
 	local canHandleMouse = not ig.igGetIO()[0].WantCaptureMouse
@@ -181,7 +181,7 @@ App.update = [:] do
 			local y = math.floor(pos.y + .5)
 			if x >= 0 and x < gridsize and y >= 0 and y < gridsize then
 				pingpong:draw{
-					callback = [] do
+					callback = || do
 						gl.glReadPixels(x, gridsize-1, 1, 1, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, value)
 						value[0] = value[0] == 0 ? -1 : 0
 					end,
@@ -197,7 +197,7 @@ App.update = [:] do
 	-- update
 	gl.glViewport(0, 0, gridsize, gridsize)
 	pingpong:draw{
-		callback = [] do
+		callback = || do
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 			self.updateSceneObj.texs[1] = pingpong:prev()
 			self.updateSceneObj.uniforms.mvProjMat = self.pingPongProjMat.ptr
@@ -216,12 +216,12 @@ App.update = [:] do
 	App.super.update(self)
 end
 
-App.updateGUI = [:] do
+App.updateGUI = |:| do
 	if ig.igButton'Save' then
 		pingpong:prev():bind(0)	-- prev? shouldn't this be cur?
 		gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, bufferCPU)
 		pingpong:prev():unbind(0)
-		Image(gridsize, gridsize, 3, 'unsigned char', [x, y]
+		Image(gridsize, gridsize, 3, 'unsigned char', |x, y|
 			colors[1 + tonumber(bufferCPU[x + gridsize * y]) % modulo]:unpack()
 		):save'output.glsl.png'
 	end
