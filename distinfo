@@ -1,11 +1,15 @@
+--------------------------------------------
+-- generated with dist/build-distinfo.rua --
+--------------------------------------------
+
 name = "rule110"
 files = {
-	["README.md"] = "rule110/README.md",
-	["distinfo"] = "rule110/distinfo",
-	["pic.png"] = "rule110/pic.png",
-	["rule110-dev-1.rockspec"] = "rule110/rule110-dev-1.rockspec",
-	["rule110.lua"] = "rule110/rule110.lua",
-	["rule110.rua"] = "rule110/rule110.rua",
+	"README.md",
+	"distinfo",
+	"pic.png",
+	"rule110-dev-1.rockspec",
+	"rule110.lua",
+	"rule110.rua",
 }
 deps = {
 	"ext",
