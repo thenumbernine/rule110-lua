@@ -6,7 +6,7 @@ local gl = require 'gl'
 local template = require 'template'
 local vec3ub = require 'vec-ffi.vec3ub'
 local vec2d = require 'vec-ffi.vec2d'
-local matrix_ffi = require 'matrix.ffi'
+local vec4x4f = require 'vec-ffi.vec4x4f'
 local Image = require 'image'
 local glreport = require 'gl.report'
 local GLPingPong = require 'gl.pingpong'
@@ -51,7 +51,7 @@ function App:initGL()
 	self.view.orthoSize = 1
 	self.view.pos:set(0, 0, 1)
 
-	self.pingPongProjMat = matrix_ffi({4,4}, 'float'):zeros():setOrtho(-1, 1, -1, 1, -1, 1)
+	self.pingPongProjMat = vec4x4f():setOrtho(-1, 1, -1, 1, -1, 1)
 
 	gl.glClearColor(.2, .2, .2, 0)
 
