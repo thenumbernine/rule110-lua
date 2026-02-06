@@ -8,7 +8,6 @@ local vec3ub = require 'vec-ffi.vec3ub'
 local vec2d = require 'vec-ffi.vec2d'
 local vec4x4f = require 'vec-ffi.vec4x4f'
 local Image = require 'image'
-local glreport = require 'gl.report'
 local GLPingPong = require 'gl.pingpong'
 local GLGeometry = require 'gl.geometry'
 local GLSceneObject = require 'gl.sceneobject'
@@ -162,8 +161,6 @@ void main() {
 		},
 		geometry = self.quadGeom,
 	}
-
-	glreport 'here'
 end
 
 -- hmm wish there was an easier way to do this
@@ -265,8 +262,6 @@ function App:updateGUI()
 	if ig.igButton'Reset' then
 		reset()
 	end
-
-	glreport'here'
 end
 
 return App():run()
